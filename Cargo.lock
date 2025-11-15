@@ -168,7 +168,7 @@ checksum = "b35204fbdc0b3f4446b89fc1ac2cf84a8a68971995d0bf2e925ec7cd960f9cb3"
 
 [[package]]
 name = "cargo-pio"
-version = "0.27.0"
+version = "0.26.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -336,7 +336,7 @@ checksum = "48c757948c5ede0e46177b7add2e67155f70e33c07fea8284df6576da70b3719"
 
 [[package]]
 name = "embuild"
-version = "0.34.0"
+version = "0.33.1"
 dependencies = [
  "anyhow",
  "bindgen",
@@ -630,7 +630,7 @@ dependencies = [
 
 [[package]]
 name = "ldproxy"
-version = "0.4.0"
+version = "0.3.4"
 dependencies = [
  "anyhow",
  "embuild",
