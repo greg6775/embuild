@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.34.0] - 2025-11-15
+### Breaking
+- Updated to Rust 2024 edition
+- Updated all dependencies to latest versions
+- cargo-pio: Migrated from structopt to clap 4 derive API
+
 ## [0.33.1] - 2025-07-27
 - Fix a bug where the cmake utilities refused to work with CMake 4 due to a broken version check
 

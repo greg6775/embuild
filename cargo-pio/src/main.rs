@@ -7,106 +7,106 @@ use embuild::cargo::CargoCmd;
 use embuild::pio::*;
 use embuild::*;
 use log::*;
-use structopt::StructOpt;
+use clap::Parser;
 use tempfile::TempDir;
 
 const PLATFORMIO_ESP32_EXCEPTION_DECODER_DIFF: &[u8] =
     include_bytes!("patches/filter_exception_decoder_esp32c3_external_conf_fix.diff");
 
-#[derive(Debug, StructOpt)]
-#[structopt(
+#[derive(Debug, Parser)]
+#[command(
     author,
     about = "Cargo <-> PlatformIO integration. Build Rust embedded projects with PlatformIO!",
-    setting = structopt::clap::AppSettings::DeriveDisplayOrder
+    next_display_order = None
 )]
 struct Opt {
     /// Prints verbose output
-    #[structopt(short, long)]
+    #[arg(short, long)]
     verbose: bool,
     /// Stay quiet, don't print any output
-    #[structopt(short, long)]
+    #[arg(short, long)]
     quiet: bool,
 
-    #[structopt(subcommand)]
+    #[command(subcommand)]
     cmd: Command,
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 enum Command {
     /// Installs PlatformIO
     Installpio {
         /// The directory where PlatformIO should be installed. Defaults to ~/.platformio
-        #[structopt(parse(from_os_str))]
+        #[arg(value_parser)]
         path: Option<PathBuf>,
     },
     /// Checks whether PlatformIO is installed
     Checkpio {
         /// PlatformIO installation directory to be checked. Defaults to ~/.platformio
-        #[structopt(parse(from_os_str))]
+        #[arg(value_parser)]
         path: Option<PathBuf>,
     },
     /// Prints one or all Scons environment variables that would be used when PlatformIO builds a project
     Printscons {
-        #[structopt(flatten)]
+        #[command(flatten)]
         framework_args: PioFrameworkArgs,
 
         /// Precise Scons environment variables calculation. Simulates a real PlatformIO build
-        #[structopt(long)]
+        #[arg(long)]
         precise: bool,
 
         /// Do a release build
-        #[structopt(short, long)]
+        #[arg(short, long)]
         release: bool,
 
         /// PlatformIO Scons environment variable to print
-        #[structopt(short = "s", long,
-                    possible_values = &["path", "incflags", "libflags", "libdirflags", "libs",
-                                        "linkflags", "link", "linkcom", "mcu", "clangargs"])]
+        #[arg(short = 's', long,
+              value_parser = ["path", "incflags", "libflags", "libdirflags", "libs",
+                              "linkflags", "link", "linkcom", "mcu", "clangargs"])]
         var: Option<String>,
     },
     /// Creates a new PIO->Cargo project
     New {
-        #[structopt(flatten)]
+        #[command(flatten)]
         pio_ini_args: PioIniArgs,
 
         /// The directory where the PIO->Cargo project should be created
-        #[structopt(parse(from_os_str))]
+        #[arg(value_parser)]
         path: PathBuf,
 
         /// Pass-through arguments down to Cargo
-        #[structopt(required = false, allow_hyphen_values = true, last = true)]
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         cargo_args: Vec<String>,
     },
     /// Creates a new PIO->Cargo project in an existing directory
     Init {
-        #[structopt(flatten)]
+        #[command(flatten)]
         pio_ini_args: PioIniArgs,
 
         /// The directory where the PIO->Cargo project should be created
-        #[structopt(parse(from_os_str))]
+        #[arg(value_parser)]
         path: Option<PathBuf>,
 
         /// Pass-through arguments down to Cargo
-        #[structopt(required = false, allow_hyphen_values = true, last = true)]
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         cargo_args: Vec<String>,
     },
     /// Upgrades an existing Cargo library crate to a PIO->Cargo project
     Upgrade {
-        #[structopt(flatten)]
+        #[command(flatten)]
         pio_ini_args: PioIniArgs,
 
         /// The directory of the existing Cargo library crate. Defaults to the current directory
-        #[structopt(parse(from_os_str))]
+        #[arg(value_parser)]
         path: Option<PathBuf>,
 
         /// Pass-through arguments down to Cargo
-        #[structopt(required = false, allow_hyphen_values = true, last = true)]
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         cargo_args: Vec<String>,
     },
     /// Updates an existing PIO->Cargo project with the latest PlatformIO=>Cargo integration scripts
     Update {
         /// The directory of the existing Cargo library crate. Defaults to the current directory
-        #[structopt(parse(from_os_str))]
+        #[arg(value_parser)]
         path: Option<PathBuf>,
     },
     /// Builds a PIO->Cargo project (both the Cargo library crate and the PlatformIO build)
@@ -141,115 +141,115 @@ enum Command {
     },
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, clap::Args)]
 struct PioInstallation {
     /// PlatformIO installation directory (default is ~/.platformio)
-    #[structopt(short = "i", long = "pio-installation")]
+    #[arg(short = 'i', long = "pio-installation")]
     pio_path: Option<PathBuf>,
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, clap::Args)]
 struct PioFrameworkArgs {
-    #[structopt(flatten)]
+    #[command(flatten)]
     pio_install: PioInstallation,
 
     /// Resolves the PlatformIO project with this board ID
-    #[structopt(short, long)]
+    #[arg(short, long)]
     board: Option<String>,
 
     /// Resolves the PlatformIO project with this MCU ID
-    #[structopt(short, long)]
+    #[arg(short, long)]
     mcu: Option<String>,
 
     /// Resolves the PlatformIO project with this platform ID
-    #[structopt(short, long)]
+    #[arg(short, long)]
     platform: Option<String>,
 
     /// Resolves the PlatformIO project with this framework ID(s)
-    #[structopt(short, long)]
+    #[arg(short, long)]
     frameworks: Option<Vec<String>>,
 
     /// Rust target to be used. Defaults to a target derived from the board MCU
-    #[structopt(short, long)]
+    #[arg(short, long)]
     target: Option<String>,
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, clap::Args)]
 struct PioIniArgs {
-    #[structopt(flatten)]
+    #[command(flatten)]
     framework_args: PioFrameworkArgs,
     /// Selects which part of the standard library cargo should build
     ///
     /// If not set to `none` create an `[unstable]` section in `.cargo/config.toml` that
     /// specifies if `core` or `std` should be built by cargo. Useful for targets that do
     /// not have `core` or `std` pre-built.
-    #[structopt(short = "s", long, parse(from_str = parse_build_std),
-                default_value = "core", possible_values = &["none", "core", "std"])]
+    #[arg(short = 's', long, value_parser = parse_build_std,
+                default_value = "core")]
     build_std: cargo::BuildStd,
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, clap::Subcommand)]
 enum EspidfCommand {
     /// Generates or updates the ESP-IDF sdkconfig file using the ESP-IDF Menuconfig interactive system
     Menuconfig {
         /// Rust target for which the sdkconfig file will be generated or updated
-        #[structopt(short, long)]
+        #[arg(short, long)]
         target: Option<String>,
 
         /// Indicates release configuration
         ///
         /// Equivalent to '-e release'
-        #[structopt(long, short)]
+        #[arg(long, short)]
         release: Option<bool>,
 
         /// PlatformIO environment to configure
         ///
         /// If not specified, the PlatformIO project default environment will be used (or error will be generated if there isn't one)
-        #[structopt(long, short = "e")]
+        #[arg(long, short = 'e')]
         environment: Option<String>,
     },
     /// Invokes the PlatformIO monitor
     Monitor {
         /// Port
-        #[structopt()]
+        #[arg()]
         port: String,
 
         /// Baud rate. Defaults to 115200
-        #[structopt(short = "b", long)]
+        #[arg(short = 'b', long)]
         baud_rate: Option<u32>,
 
         /// Do not apply encodings/transformations
-        #[structopt(long)]
+        #[arg(long)]
         raw: bool,
 
         /// Binary name built by this crate for which the monitor will be invoked (necessary for access to the ELF file)
-        #[structopt(long)]
+        #[arg(long)]
         binary: Option<String>,
 
         /// Rust target for which the monitor will be invoked (necessary for access to the ELF file)
-        #[structopt(short, long)]
+        #[arg(short, long)]
         target: Option<String>,
 
         /// Indicates release configuration
         ///
         /// Equivalent to '-e release'
-        #[structopt(long, short)]
+        #[arg(long, short)]
         release: Option<bool>,
 
         /// PlatformIO environment to monitor
         ///
         /// If not specified, the PlatformIO project default environment will be used (or error will be generated if there isn't one)
-        #[structopt(long, short = "e")]
+        #[arg(long, short = 'e')]
         environment: Option<String>,
     },
 }
 
-fn parse_build_std(s: &str) -> cargo::BuildStd {
+fn parse_build_std(s: &str) -> Result<cargo::BuildStd, String> {
     match s {
-        "none" => cargo::BuildStd::None,
-        "core" => cargo::BuildStd::Core,
-        "std" => cargo::BuildStd::Std,
-        _ => panic!(),
+        "none" => Ok(cargo::BuildStd::None),
+        "core" => Ok(cargo::BuildStd::Core),
+        "std" => Ok(cargo::BuildStd::Std),
+        _ => Err(format!("Invalid build-std value: {}", s)),
     }
 }
 
@@ -271,7 +271,7 @@ fn main() -> Result<()> {
     let as_plugin = env::args().nth(1).iter().any(|s| s == "pio");
 
     let args = env::args_os().skip(as_plugin as usize);
-    let opt = Opt::from_iter(args);
+    let opt = Opt::parse_from(args);
 
     let pio_log_level = if opt.quiet {
         LogLevel::Quiet

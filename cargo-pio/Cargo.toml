@@ -1,8 +1,8 @@
 [package]
 name = "cargo-pio"
-version = "0.26.0"
-edition = "2021"
-rust-version = "1.58"
+version = "0.27.0"
+edition = "2024"
+rust-version = "1.85"
 authors = ["Ivan Markov <ivan.markov@gmail.com>", "Dominik Gschwind <dominik.gschwind99@gmail.com>"]
 categories = ["embedded", "development-tools::cargo-plugins"]
 keywords = ["cargo", "platformio"]
@@ -12,9 +12,9 @@ license = "MIT OR Apache-2.0"
 readme = "README.md"
 
 [dependencies]
-embuild = { version = "0.33", path = "..", features = ["pio"] }
-anyhow = {version = "1", features = ["backtrace"]}
-log = "0.4"
-env_logger = "0.9"
-structopt = { version = "0.3.22" }
-tempfile = "3.2"
+embuild = { version = "0.34", path = "..", features = ["pio"] }
+anyhow = {version = "1.0.100", features = ["backtrace"]}
+log = "0.4.28"
+env_logger = "0.11.8"
+clap = { version = "4.5.51", features = ["derive"] }
+tempfile = "3.23.0"

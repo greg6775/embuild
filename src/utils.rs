@@ -92,17 +92,17 @@ impl OsStrExt for PathBuf {}
 /// Fails if the response status is not `200` (`OK`).
 #[cfg(feature = "ureq")]
 pub fn download_file_to(url: &str, writer: &mut impl std::io::Write) -> Result<()> {
-    let req = ureq::get(url).call()?;
-    if req.status() != 200 {
+    let mut req = ureq::get(url).call()?;
+    let status = req.status();
+    if status != 200 {
         anyhow::bail!(
-            "Server at url '{}' returned unexpected status {}: {}",
+            "Server at url '{}' returned unexpected status {}",
             url,
-            req.status(),
-            req.status_text()
+            status
         );
     }
 
-    let mut reader = req.into_reader();
+    let mut reader = req.body_mut().as_reader();
     std::io::copy(&mut reader, writer)?;
     Ok(())
 }

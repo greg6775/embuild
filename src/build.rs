@@ -87,18 +87,18 @@ pub fn env_globs_iter(
 }
 
 #[cfg(feature = "glob")]
-pub fn tracked_globs_iter(
-    base: impl AsRef<Path>,
-    globs: &[impl AsRef<str>],
-) -> Result<impl Iterator<Item = (PathBuf, PathBuf)>> {
+pub fn tracked_globs_iter<T: AsRef<Path>, U: AsRef<str>>(
+    base: T,
+    globs: &[U],
+) -> Result<impl Iterator<Item = (PathBuf, PathBuf)> + use<T, U>> {
     track_sources(globs_iter(base, globs)?)
 }
 
 #[cfg(feature = "glob")]
-pub fn globs_iter(
-    base: impl AsRef<Path>,
-    globs: &[impl AsRef<str>],
-) -> Result<impl Iterator<Item = (PathBuf, PathBuf)>> {
+pub fn globs_iter<T: AsRef<Path>, U: AsRef<str>>(
+    base: T,
+    globs: &[U],
+) -> Result<impl Iterator<Item = (PathBuf, PathBuf)> + use<T, U>> {
     let base = base.as_ref().to_owned();
 
     Ok(globwalk::GlobWalkerBuilder::from_patterns(&base, globs)

@@ -50,6 +50,7 @@ bitflags! {
     /// Argument options for parsing and formatting arguments.
     ///
     /// See [`ArgDef::parse`] and [`ArgDef::format`] for parsing and formatting.
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
     pub struct ArgOpts: u32 {
         /// The argument can use a single hypen (ex. `-<argname>`)
         const SINGLE_HYPHEN = (1 << 0);

@@ -162,9 +162,8 @@ impl Cmd {
                     )
                 })
             }
-            .map_err(|e| {
+            .inspect_err(|_| {
                 self.print_output(&result);
-                e
             })
             .map(|_| func(result)),
         }

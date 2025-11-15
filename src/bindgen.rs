@@ -235,7 +235,7 @@ impl BindgenExt for bindgen::Builder {
 }
 
 fn try_get_sysroot(linker: &Option<impl AsRef<Path>>) -> Result<PathBuf> {
-    let linker = if let Some(ref linker) = linker {
+    let linker = if let Some(linker) = linker {
         linker.as_ref().to_owned()
     } else if let Some(linker) = env::var_os("RUSTC_LINKER") {
         PathBuf::from(linker)
