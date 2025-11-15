@@ -6,7 +6,7 @@ use std::{env, fmt};
 use anyhow::{Error, Result};
 use xmas_elf::sections::{SectionData, ShType};
 use xmas_elf::symbol_table::{Binding, Visibility};
-use xmas_elf::{symbol_table, ElfFile};
+use xmas_elf::{ElfFile, symbol_table};
 
 pub const VAR_SYMBOLS_FILE: &str = "EMBUILD_GENERATED_SYMBOLS_FILE";
 
@@ -217,8 +217,10 @@ impl Symgen {
                         output,
                         "#[allow(dead_code, non_upper_case_globals)]\npub const {name}: *{mutable} {typ} = 0x{addr:x} as *{mutable} {typ};\n",
                         name = pointer.name,
-                        mutable = if pointer.mutable { "mut" } else {"const" },
-                        typ = pointer.r#type.unwrap_or_else(|| "core::ffi::c_void".to_owned()),
+                        mutable = if pointer.mutable { "mut" } else { "const" },
+                        typ = pointer
+                            .r#type
+                            .unwrap_or_else(|| "core::ffi::c_void".to_owned()),
                         addr = self.start_addr + sym.value()
                     )?;
                 } else {

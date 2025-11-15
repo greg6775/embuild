@@ -183,7 +183,14 @@ mod tests {
         let a_space = Arg::option("a").with_opts(ArgOpts::VALUE_SEP_NEXT_ARG);
         let a_equals = Arg::option("a").with_opts(ArgOpts::VALUE_SEP_EQUALS);
 
-        let [flag_single_hyphen, flag_double_hyphen, f, a_equals, a_no_space, a_space] = [
+        let [
+            flag_single_hyphen,
+            flag_double_hyphen,
+            f,
+            a_equals,
+            a_no_space,
+            a_space,
+        ] = [
             &flag_single_hyphen,
             &flag_double_hyphen,
             &f,

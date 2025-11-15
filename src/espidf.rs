@@ -17,7 +17,7 @@ use std::process::Command;
 use std::sync::Arc;
 use std::{env, fs};
 
-use anyhow::{anyhow, Context, Error, Result};
+use anyhow::{Context, Error, Result, anyhow};
 use serde::{Deserialize, Serialize};
 
 use crate::python::PYTHON;
@@ -449,7 +449,7 @@ impl EspIdf {
                          given by ${IDF_PATH_VAR} ('{}')",
                     a.display(),
                     b.display()
-                )))
+                )));
             }
             // ignore this check if canonicalize fails
             _ => (),

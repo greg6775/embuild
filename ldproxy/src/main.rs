@@ -4,7 +4,7 @@ use std::path::Path;
 use std::process::Command;
 use std::vec::Vec;
 
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use embuild::build;
 use embuild::cli::{ParseFrom, UnixCommandArgs};
 use log::*;

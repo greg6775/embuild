@@ -156,9 +156,9 @@ impl Iterator for WindowsCommandArgs<'_> {
     }
 }
 
+pub use shlex::Shlex as UnixCommandArgs;
 pub use shlex::join as join_unix_args;
 pub use shlex::quote as quote_unix_arg;
-pub use shlex::Shlex as UnixCommandArgs;
 
 #[cfg(windows)]
 pub type NativeCommandArgs<'a> = WindowsCommandArgs<'a>;

@@ -6,7 +6,7 @@ use std::fmt::Display;
 use std::num::NonZeroU64;
 use std::path::{Path, PathBuf};
 
-use anyhow::{anyhow, Context};
+use anyhow::{Context, anyhow};
 
 use crate::cmd;
 use crate::cmd::CmdError;
@@ -501,7 +501,7 @@ pub mod sdk {
     use std::hash::{Hash, Hasher};
     use std::path::Path;
 
-    use anyhow::{anyhow, Context, Result};
+    use anyhow::{Context, Result, anyhow};
 
     use crate::git;
 

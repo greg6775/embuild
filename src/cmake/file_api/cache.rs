@@ -3,10 +3,10 @@
 use std::convert::TryFrom;
 use std::fs;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use serde::Deserialize;
 
-use super::{index, ObjKind, Version};
+use super::{ObjKind, Version, index};
 
 /// The variables stored in the persistent cache (`CMakeCache.txt`) for the build tree.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]

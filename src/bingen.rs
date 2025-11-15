@@ -66,8 +66,8 @@ impl Bingen {
 mod segments {
     use std::cmp::Ordering;
 
-    use xmas_elf::program::{SegmentData, Type};
     use xmas_elf::ElfFile;
+    use xmas_elf::program::{SegmentData, Type};
 
     /// A segment of code from the source elf
     #[derive(Debug, Ord, Eq)]

@@ -7,7 +7,7 @@ use std::fmt::Display;
 use std::path::{Path, PathBuf};
 use std::{env, vec};
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result, anyhow};
 
 use crate::cargo::{self, add_link_arg, print_warning, set_metadata, track_file};
 use crate::cli::{self, Arg, ArgDef};

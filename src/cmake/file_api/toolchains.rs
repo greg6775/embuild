@@ -4,11 +4,11 @@ use std::convert::TryFrom;
 use std::fs;
 use std::path::PathBuf;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use serde::Deserialize;
 
 use super::codemodel::Language;
-use super::{index, ObjKind, Version};
+use super::{ObjKind, Version, index};
 
 /// Toolchain object.
 ///

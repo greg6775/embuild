@@ -11,13 +11,13 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output, Stdio};
 
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use log::*;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use tempfile::*;
 
-use crate::python::{check_python_at_least, PYTHON};
+use crate::python::{PYTHON, check_python_at_least};
 use crate::utils;
 
 const INSTALLER_URL: &str = "https://raw.githubusercontent.com/platformio/platformio-core-installer/master/get-platformio.py";
@@ -812,18 +812,28 @@ impl Resolver {
                     .collect::<Vec<_>>();
 
                 if boards.is_empty() {
-                    bail!("None of the boards in PIO matching the configured board '{}' supports the configured platform '{}'", board_id, configured_platform);
+                    bail!(
+                        "None of the boards in PIO matching the configured board '{}' supports the configured platform '{}'",
+                        board_id,
+                        configured_platform
+                    );
                 } else if boards.len() > 1 {
-                    bail!("Should not happen: multiple boards in PIO found matching the configured board '{}' and the configured platform '{}'", board_id, configured_platform);
+                    bail!(
+                        "Should not happen: multiple boards in PIO found matching the configured board '{}' and the configured platform '{}'",
+                        board_id,
+                        configured_platform
+                    );
                 }
             } else {
-                bail!("Configured board '{}' matches multiple boards in PIO: [{}]; please specify platform or target for proper resolution",
+                bail!(
+                    "Configured board '{}' matches multiple boards in PIO: [{}]; please specify platform or target for proper resolution",
                     board_id,
                     boards
                         .iter()
                         .map(|b| b.id.as_str())
                         .collect::<Vec<_>>()
-                        .join(", "))
+                        .join(", ")
+                )
             }
         }
 
@@ -838,7 +848,8 @@ impl Resolver {
                     board.id,
                     board.platform,
                     target_pmf.platform,
-                    target);
+                    target
+                );
             }
 
             if !target_pmf.mcus.iter().any(|mcu| *mcu == board.mcu) {
@@ -847,7 +858,8 @@ impl Resolver {
                     board.id,
                     board.mcu,
                     target_pmf.mcus.join(", "),
-                    target);
+                    target
+                );
             }
 
             if target_pmf
@@ -860,7 +872,8 @@ impl Resolver {
                     board.id,
                     board.frameworks.join(", "),
                     target_pmf.frameworks.join(", "),
-                    target);
+                    target
+                );
             }
 
             if params.platform.is_none() {
@@ -876,7 +889,9 @@ impl Resolver {
             if params.mcu.is_none() {
                 warn!(
                     "Configuring first supported MCU '{}' derived from the build target '{}' supporting MCUs [{}].\nExplicitly specify a board or an MCU to resolve this ambiguity",
-                    target_pmf.mcus[0], target, target_pmf.mcus.join(", ")
+                    target_pmf.mcus[0],
+                    target,
+                    target_pmf.mcus.join(", ")
                 );
 
                 params.mcu = Some(target_pmf.mcus[0].into());
@@ -887,7 +902,8 @@ impl Resolver {
                     "Configuring framework '{}' from the frameworks [{}] derived from the build target '{}'",
                     target_pmf.frameworks[0],
                     target_pmf.frameworks.join(", "),
-                    target);
+                    target
+                );
 
                 params.frameworks.push(target_pmf.frameworks[0].into());
             }
@@ -899,7 +915,8 @@ impl Resolver {
                     "Platforms mismatch: configured board '{}' has platform '{}' in PIO, which does not match the configured platform '{}'",
                     board.id,
                     board.platform,
-                    configured_platform);
+                    configured_platform
+                );
             }
         } else {
             info!(
@@ -916,7 +933,8 @@ impl Resolver {
                     "Platforms mismatch: configured board '{}' has MCU '{}' in PIO, which does not match the configured MCU '{}'",
                     board.id,
                     board.mcu,
-                    configured_mcu);
+                    configured_mcu
+                );
             }
         } else {
             info!(
@@ -937,14 +955,16 @@ impl Resolver {
                     "Frameworks mismatch: configured board '{}' has frameworks [{}] in PIO, which do not contain the configured frameworks [{}]",
                     board.id,
                     board.frameworks.join(", "),
-                    params.frameworks.join(", "));
+                    params.frameworks.join(", ")
+                );
             }
         } else {
             info!(
                 "Configuring framework '{}' from the frameworks [{}] supported by the configured board '{}'",
                 board.frameworks[0],
                 board.frameworks.join(", "),
-                board.id);
+                board.id
+            );
 
             params.frameworks.push(board.frameworks[0].clone());
         }
@@ -975,7 +995,8 @@ impl Resolver {
                         "Platforms mismatch: configured platform '{}' does not match platform '{}', which was derived from the build target '{}'",
                         configured_platform,
                         target_pmf.platform,
-                        target);
+                        target
+                    );
                 }
             } else {
                 info!(
@@ -992,12 +1013,15 @@ impl Resolver {
                         "MCUs mismatch: configured MCU '{}' does not match MCUs [{}], which were derived from the build target '{}'",
                         configured_mcu,
                         target_pmf.mcus.join(", "),
-                        target);
+                        target
+                    );
                 }
             } else {
                 warn!(
                     "Configuring first supported MCU '{}' derived from the build target '{}' supporting MCUs [{}].\nExplicitly specify a board or an MCU to resolve this ambiguity",
-                    target_pmf.mcus[0], target, target_pmf.mcus.join(", ")
+                    target_pmf.mcus[0],
+                    target,
+                    target_pmf.mcus.join(", ")
                 );
 
                 params.mcu = Some(target_pmf.mcus[0].into());
@@ -1013,14 +1037,16 @@ impl Resolver {
                         "Frameworks mismatch: configured frameworks [{}] are not contained in the frameworks [{}], which were derived from the build target '{}'",
                         params.frameworks.join(", "),
                         target_pmf.frameworks.join(", "),
-                        target);
+                        target
+                    );
                 }
             } else {
                 info!(
                     "Configuring framework '{}' from the frameworks [{}] derived from the build target '{}'",
                     target_pmf.frameworks[0],
                     target_pmf.frameworks.join(", "),
-                    target);
+                    target
+                );
 
                 params.frameworks.push(target_pmf.frameworks[0].into());
             }
@@ -1076,14 +1102,20 @@ impl Resolver {
                     bail!(
                         "(Some of) the configured frameworks [{}] are not supported by the configured platform '{}'",
                         not_found_frameworks.join(", "),
-                        configured_platform);
+                        configured_platform
+                    );
                 }
             } else {
                 info!(
                     "Configuring framework '{}' from the frameworks [{}] matching the configured platform '{}'",
                     frameworks[0].name,
-                    frameworks.iter().map(|f| f.name.as_str()).collect::<Vec<_>>().join(", "),
-                    configured_platform);
+                    frameworks
+                        .iter()
+                        .map(|f| f.name.as_str())
+                        .collect::<Vec<_>>()
+                        .join(", "),
+                    configured_platform
+                );
 
                 params.frameworks.push(frameworks[0].name.clone());
             }
@@ -1108,20 +1140,25 @@ impl Resolver {
                 .unwrap_or_default();
 
             if platforms.is_empty() {
-                bail!("Cannot select a platform: configured frameworks [{}] do not have a common platform", params.frameworks.join(", "));
+                bail!(
+                    "Cannot select a platform: configured frameworks [{}] do not have a common platform",
+                    params.frameworks.join(", ")
+                );
             }
 
             if platforms.len() > 1 {
                 bail!(
                     "Cannot select a platform: configured frameworks [{}] have multiple common platforms: [{}]",
                     params.frameworks.join(", "),
-                    platforms.join(", "));
+                    platforms.join(", ")
+                );
             }
 
             info!(
                 "Configuring platform '{}' as the only common one of the configured frameworks [{}]",
                 platforms[0],
-                params.frameworks.join(", "));
+                params.frameworks.join(", ")
+            );
 
             params.platform = Some(platforms[0].clone());
         }
@@ -1154,7 +1191,8 @@ impl Resolver {
             bail!(
                 "Configured platform '{}' and frameworks [{}] do not have any matching board defined in PIO",
                 params.platform.as_ref().unwrap(),
-                params.frameworks.join(", "));
+                params.frameworks.join(", ")
+            );
         } else {
             if params.mcu.is_some() {
                 boards = boards
@@ -1167,7 +1205,8 @@ impl Resolver {
                         "Configured platform '{}', MCU '{}' and frameworks [{}] do not have any matching board defined in PIO",
                         params.platform.as_ref().unwrap(),
                         params.mcu.as_ref().unwrap(),
-                        params.frameworks.join(", "));
+                        params.frameworks.join(", ")
+                    );
                 }
             } else {
                 let mcus = boards
@@ -1182,13 +1221,15 @@ impl Resolver {
                         "Configured platform '{}' and frameworks [{}] match multiple MCUs in PIO: [{}]",
                         params.platform.as_ref().unwrap(),
                         params.frameworks.join(", "),
-                        mcus.join(", "));
+                        mcus.join(", ")
+                    );
                 } else {
                     info!(
                         "Configuring MCU '{}' which supports configured platform '{}' and configured frameworks [{}]",
                         mcus[0],
                         params.platform.as_ref().unwrap(),
-                        params.frameworks.join(", "));
+                        params.frameworks.join(", ")
+                    );
 
                     params.mcu = Some(mcus[0].clone());
                 }
@@ -1199,7 +1240,8 @@ impl Resolver {
                 boards[0].id,
                 params.platform.as_ref().unwrap(),
                 params.mcu.as_ref().unwrap(),
-                params.frameworks.join(", "));
+                params.frameworks.join(", ")
+            );
 
             params.board = Some(boards[0].id.clone());
         }

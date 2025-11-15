@@ -2,12 +2,12 @@ use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use std::{env, fs};
 
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
+use clap::Parser;
 use embuild::cargo::CargoCmd;
 use embuild::pio::*;
 use embuild::*;
 use log::*;
-use clap::Parser;
 use tempfile::TempDir;
 
 const PLATFORMIO_ESP32_EXCEPTION_DECODER_DIFF: &[u8] =
@@ -692,7 +692,9 @@ fn derive_target(project: impl AsRef<Path>, target: Option<&str>) -> Result<Stri
 
         target
     } else {
-        bail!("Cannot find 'target=' specification in any Cargo configuration file. Please use the --target parameter to specify the target on the command line");
+        bail!(
+            "Cannot find 'target=' specification in any Cargo configuration file. Please use the --target parameter to specify the target on the command line"
+        );
     })
 }
 

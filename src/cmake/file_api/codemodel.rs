@@ -7,11 +7,11 @@ use std::fs;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use anyhow::{anyhow, Context, Error, Result};
+use anyhow::{Context, Error, Result, anyhow};
 use serde::Deserialize;
 
-use super::index::{self, ObjKind};
 use super::Version;
+use super::index::{self, ObjKind};
 
 /// The description of the build system structure as modeled by CMake.
 #[derive(Debug, Deserialize, Clone)]
@@ -166,7 +166,7 @@ pub use target::Target;
 pub mod target {
     use std::path::{Path, PathBuf};
 
-    use anyhow::{anyhow, Context, Result};
+    use anyhow::{Context, Result, anyhow};
     use serde::Deserialize;
 
     use super::Language;
